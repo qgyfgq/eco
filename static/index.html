@@ -8,10 +8,19 @@
 </head>
 <body>
   <header>
-    <h1>金融量化投资平台</h1>
+    <div class="header-top">
+      <div class="brand">
+        <span class="brand-logo">📈</span>
+        <div class="brand-text">
+          <h1>金融量化投资平台</h1>
+          <p class="subtitle">因子自动分析 · 技术指标自动回测</p>
+        </div>
+      </div>
+      <span class="student-id">学号：23020168</span>
+    </div>
     <nav class="tabs">
-      <button class="tab active" data-tab="m1">模块一 · 因子分析</button>
-      <button class="tab" data-tab="m2">模块二 · 策略回测</button>
+      <button class="tab active" data-tab="m1">因子自动分析框架</button>
+      <button class="tab" data-tab="m2">技术指标自动回测框架</button>
     </nav>
   </header>
 
@@ -19,7 +28,7 @@
     <!-- ========== 模块一 ========== -->
     <section id="m1" class="panel active">
       <div class="card config">
-        <h2>因子表达式</h2>
+        <h2>因子表达式输入</h2>
         <p class="hint">把 <code>open/close/high/low/volume</code> 当操作数，运算当算子，可嵌套。例如
           <code>rank(-close)</code>、<code>mean(close,3)</code>、<code>zscore(delta(close,1))</code>。</p>
         <textarea id="m1-expr" rows="2" placeholder="rank(-close)">rank(-close)</textarea>
@@ -48,7 +57,7 @@
     <!-- ========== 模块二 ========== -->
     <section id="m2" class="panel">
       <div class="card config">
-        <h2>策略信号表达式</h2>
+        <h2>策略信号表达式输入</h2>
         <p class="hint">只做多/空仓，禁止做空。无持仓且买入信号成立则下一根满仓买入；持仓且卖出信号成立则全部卖出。</p>
         <label class="block">买入信号
           <textarea id="m2-buy" rows="2">cross_up(close, mean(close,20))</textarea>
