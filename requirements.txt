@@ -1,0 +1,17 @@
+# 金融量化投资平台依赖
+# pandas/numpy 固定大版本：compat.py 的 shim 与 pandas 3.x 行为绑定，且已在此组合上验证。
+numpy>=2.2,<3
+pandas>=3.0,<3.1
+pyarrow>=18
+scipy>=1.13
+matplotlib>=3.9
+seaborn>=0.13
+statsmodels>=0.14
+empyrical-reloaded>=0.5.11
+IPython>=8.0
+pytz>=2024.1
+fastapi>=0.115
+uvicorn>=0.30
+pydantic>=2.7
+pytest>=8.0
+# 注：alphalens 使用本仓库内置源码（alphalens/），不从 PyPI 安装。

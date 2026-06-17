@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>金融量化投资平台</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>金融量化投资平台</h1>
+    <nav class="tabs">
+      <button class="tab active" data-tab="m1">模块一 · 因子分析</button>
+      <button class="tab" data-tab="m2">模块二 · 策略回测</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ========== 模块一 ========== -->
+    <section id="m1" class="panel active">
+      <div class="card config">
+        <h2>因子表达式</h2>
+        <p class="hint">把 <code>open/close/high/low/volume</code> 当操作数，运算当算子，可嵌套。例如
+          <code>rank(-close)</code>、<code>mean(close,3)</code>、<code>zscore(delta(close,1))</code>。</p>
+        <textarea id="m1-expr" rows="2" placeholder="rank(-close)">rank(-close)</textarea>
+
+        <div class="examples" id="m1-examples"></div>
+
+        <div class="params">
+          <label>分位数 <input id="m1-quantiles" type="number" value="5" min="2" max="10" /></label>
+          <label>前瞻周期 <input id="m1-periods" type="text" value="1,3" /></label>
+          <label>max_loss <input id="m1-maxloss" type="number" value="0.35" step="0.05" min="0" max="1" /></label>
+        </div>
+
+        <button id="m1-run" class="run-btn">运行因子分析</button>
+        <div id="m1-ops" class="ops-list"></div>
+      </div>
+
+      <div class="card result">
+        <div id="m1-status" class="status"></div>
+        <div id="m1-error" class="error" hidden></div>
+        <div id="m1-meta" class="meta"></div>
+        <div id="m1-tables"></div>
+        <div id="m1-images" class="images"></div>
+      </div>
+    </section>
+
+    <!-- ========== 模块二 ========== -->
+    <section id="m2" class="panel">
+      <div class="card config">
+        <h2>策略信号表达式</h2>
+        <p class="hint">只做多/空仓，禁止做空。无持仓且买入信号成立则下一根满仓买入；持仓且卖出信号成立则全部卖出。</p>
+        <label class="block">买入信号
+          <textarea id="m2-buy" rows="2">cross_up(close, mean(close,20))</textarea>
+        </label>
+        <label class="block">卖出信号
+          <textarea id="m2-sell" rows="2">cross_down(close, mean(close,20))</textarea>
+        </label>
+
+        <div class="examples" id="m2-examples"></div>
+
+        <div class="params">
+          <label>初始资金/品种 <input id="m2-capital" type="number" value="1000000" step="100000" /></label>
+          <label>手续费率 <input id="m2-fee" type="number" value="0.0003" step="0.0001" /></label>
+        </div>
+
+        <label class="block">品种（按流动性排序，留空=全部）</label>
+        <select id="m2-instruments" multiple size="8"></select>
+        <div class="inst-actions">
+          <button id="m2-top10" type="button" class="mini">选流动性前 10</button>
+          <button id="m2-clear" type="button" class="mini">清空（=全部）</button>
+        </div>
+
+        <button id="m2-run" class="run-btn">运行回测</button>
+        <div id="m2-ops" class="ops-list"></div>
+      </div>
+
+      <div class="card result">
+        <div id="m2-status" class="status"></div>
+        <div id="m2-error" class="error" hidden></div>
+        <div id="m2-metrics" class="metrics-cards"></div>
+        <div id="m2-image" class="images"></div>
+        <div id="m2-table"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
