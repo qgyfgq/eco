@@ -33,16 +33,44 @@ from logging_conf import get_logger  # noqa: E402
 logger = get_logger("factor_analysis")
 
 
-def _figs_to_base64() -> list[str]:
-    """把当前所有 matplotlib figure 转成 base64 PNG 字符串并关闭。"""
-    images = []
-    for num in plt.get_fignums():
-        fig = plt.figure(num)
-        buf = io.BytesIO()
-        fig.savefig(buf, format="png", bbox_inches="tight", dpi=90)
-        buf.seek(0)
-        images.append(base64.b64encode(buf.read()).decode("ascii"))
+def _fig_to_base64(fig) -> str:
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", bbox_inches="tight", dpi=90)
+    buf.seek(0)
+    return base64.b64encode(buf.read()).decode("ascii")
+
+
+def _capture_tear_sheet(clean) -> list[str]:
+    """运行 alphalens 完整 tear sheet 并抓取其生成的所有图。
+
+    alphalens 在每个分析段末尾调用 ``plt.show()``，某些 matplotlib 版本下
+    这会清空图形。这里临时替换 ``plt.show``：在它被调用的瞬间（图还完整时）
+    把当前所有 figure 转成 base64 存下来，再关闭，避免抓到空白图。
+    """
+    images: list[str] = []
+    seen: set[int] = set()
+
+    def _grab_show(*args, **kwargs):
+        for num in plt.get_fignums():
+            fig = plt.figure(num)
+            if fig.axes:  # 跳过没有任何子图的空白 figure
+                images.append(_fig_to_base64(fig))
+            seen.add(num)
+            plt.close(fig)
+
+    orig_show = plt.show
     plt.close("all")
+    plt.show = _grab_show
+    try:
+        create_full_tear_sheet(clean)
+        # 兜底：抓取任何未经 plt.show 处理、但确有内容的残留图
+        for num in plt.get_fignums():
+            fig = plt.figure(num)
+            if num not in seen and fig.axes:
+                images.append(_fig_to_base64(fig))
+    finally:
+        plt.show = orig_show
+        plt.close("all")
     return images
 
 
@@ -117,9 +145,7 @@ def run_factor_analysis(
         )
 
         # 完整 tear sheet（含全部分析图）
-        plt.close("all")
-        create_full_tear_sheet(clean)
-        images = _figs_to_base64()
+        images = _capture_tear_sheet(clean)
 
         result = {
             "ok": True,
